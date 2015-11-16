@@ -1,0 +1,41 @@
+#!/bin/bash
+#
+# KVM Bridge script with VM start
+
+# Define variables below (case sensitive)
+# "VM" is optional
+#
+# Example:
+# ETH=eth0
+# BRIDGE=br1
+# STP=on|off
+# FD=0
+# VM=pfSENE
+
+ETH=
+BRIDGE=
+STP=
+FD=
+VM=
+
+
+
+
+brctl delif br0 $ETH
+sed -i 's/$ETH //g' /etc/rc.d/rc.inet1.conf
+brctl addbr $BRIDGE
+brctl stp $BRIDGE $STP
+brctl setfd $BRIDGE $FD
+brctl addif $BRIDGE $ETH
+ifconfig $BRIDGE up
+if [ ! -z "$VM" ]; then
+    until [ -S "/var/run/libvirt/libvirt-sock" ]
+    do
+      echo "Sleeping for 5 seconds until (libvirt) is up..."
+      sleep 5
+    done
+  echo "Starting ($VM)..."
+  virsh start $VM
+else
+  echo "No VM is set to autostart..."
+fi
