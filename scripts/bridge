@@ -29,7 +29,7 @@ brctl setfd $BRIDGE $FD
 brctl addif $BRIDGE $ETH
 ifconfig $BRIDGE up
 if [ ! -z "$VM" ]; then
-    until [ -S "/var/run/libvirt/libvirt-sock" ]
+  until [[ -S "/var/run/libvirt/libvirt-sock" && -d "/mnt/user/" ]]
     do
       echo "Sleeping for 5 seconds until (libvirt) is up..."
       sleep 5
